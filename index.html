@@ -2,17 +2,8 @@
 <html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <!-- Updated iPad-optimized viewport to prevent zooming on tap -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Question King by Rajan MV</title>
-    
-    <!-- Added PWA & Apple specific tags for standalone app functionality -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Question King">
-    <link rel="apple-touch-icon" href="icon-192.png">
-
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Alpine.js -->
@@ -32,10 +23,14 @@
         ::-webkit-scrollbar-thumb:hover { background: #334155; }
         
         @media print {
+            @page { size: A4; margin: 15mm; }
             body { background: #fdfbf7 !important; color: #111111 !important; font-family: 'Times New Roman', Times, serif !important; margin: 0 !important; padding: 0 !important; }
             header, section.w-5\/12, .no-print { display: none !important; }
-            section.w-7\/12 { width: 100% !important; max-width: 100% !important; padding: 20px !important; background: #fdfbf7 !important; color: #111111 !important; overflow: visible !important; margin: 0 !important; border: none !important; box-shadow: none !important; }
-            .print-paper-sheet { background: #fdfbf7 !important; color: #111111 !important; border: none !important; box-shadow: none !important; padding: 0 !important; text-align: justify !important; }
+            section.w-7\/12 { width: 100% !important; max-width: 100% !important; padding: 0 !important; background: #fdfbf7 !important; color: #111111 !important; overflow: visible !important; margin: 0 !important; border: none !important; box-shadow: none !important; }
+            
+            /* FIX: Forced physical padding and box-sizing to prevent edge clipping on tablets */
+            .print-paper-sheet { background: #fdfbf7 !important; color: #111111 !important; border: none !important; box-shadow: none !important; padding: 20mm !important; box-sizing: border-box !important; text-align: justify !important; width: 100% !important; max-width: 100% !important; }
+            
             .print-header-block { text-align: center; border-bottom: 2px solid #111; padding-bottom: 12px; margin-bottom: 20px; }
             .print-header-block h2 { font-size: 18px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #111; margin: 0 0 5px 0; }
             .print-header-block p { font-size: 13px; font-weight: bold; text-transform: uppercase; color: #333; margin: 0; }
