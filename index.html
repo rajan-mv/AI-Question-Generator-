@@ -22,46 +22,19 @@
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #334155; }
         
-        /* iPad & Safari Print Fixes */
         @media print {
-            @page { size: A4; margin: 0; } /* Reset page margin to let CSS handle it strictly */
-            
-            /* Kill Flexbox on the highest levels to prevent iPad width stretching */
-            html, body { display: block !important; width: 100% !important; height: auto !important; margin: 0 !important; padding: 0 !important; background: #fff !important; color: #000 !important; font-family: 'Times New Roman', Times, serif !important; overflow: visible !important; }
-            main { display: block !important; width: 100% !important; overflow: visible !important; }
-            
+            body { background: #fdfbf7 !important; color: #111111 !important; font-family: 'Times New Roman', Times, serif !important; margin: 0 !important; padding: 0 !important; }
             header, section.w-5\/12, .no-print { display: none !important; }
-            
-            /* Reset the right-side section */
-            section.w-7\/12 { display: block !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; overflow: visible !important; border: none !important; box-shadow: none !important; background: transparent !important; }
-            
-            /* Use natural block width (auto) and physical margins to constrain the text */
-            .print-paper-sheet { 
-                display: block !important; 
-                width: auto !important; 
-                max-width: none !important;
-                margin: 15mm 20mm 15mm 15mm !important; /* Top, Right, Bottom, Left margins */
-                padding: 0 !important; 
-                border: none !important; 
-                box-shadow: none !important; 
-                background: transparent !important; 
-                text-align: justify !important; 
-            }
-            
-            .print-header-block { text-align: center; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 20px; }
-            .print-header-block h2 { font-size: 18px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #000; margin: 0 0 5px 0; }
-            .print-header-block p { font-size: 13px; font-weight: bold; text-transform: uppercase; color: #222; margin: 0; }
-            
-            .print-question-box { break-inside: avoid; page-break-inside: avoid; margin-bottom: 16px; font-size: 11.5pt; line-height: 1.4; color: #000; text-align: justify !important; }
-            
+            section.w-7\/12 { width: 100% !important; max-width: 100% !important; padding: 20px !important; background: #fdfbf7 !important; color: #111111 !important; overflow: visible !important; margin: 0 !important; border: none !important; box-shadow: none !important; }
+            .print-paper-sheet { background: #fdfbf7 !important; color: #111111 !important; border: none !important; box-shadow: none !important; padding: 0 !important; text-align: justify !important; }
+            .print-header-block { text-align: center; border-bottom: 2px solid #111; padding-bottom: 12px; margin-bottom: 20px; }
+            .print-header-block h2 { font-size: 18px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #111; margin: 0 0 5px 0; }
+            .print-header-block p { font-size: 13px; font-weight: bold; text-transform: uppercase; color: #333; margin: 0; }
+            .print-question-box { break-inside: avoid; page-break-inside: avoid; margin-bottom: 16px; font-size: 11.5pt; line-height: 1.4; color: #111; text-align: justify !important; }
             .print-options-grid-2 { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 4px 12px !important; margin-top: 4px; font-size: 11pt; text-align: justify !important; }
-            
-            /* Kill Flexbox on options list to prevent nested cutoff */
-            .print-options-grid-1 { display: block !important; margin-top: 6px; font-size: 11pt; text-align: justify !important; }
-            .print-options-grid-1 > div { margin-bottom: 6px !important; break-inside: avoid; }
-            
+            .print-options-grid-1 { display: flex !important; flex-direction: column !important; gap: 6px !important; margin-top: 6px; font-size: 11pt; text-align: justify !important; }
             .print-solution-section { page-break-before: always; margin-top: 0; border: none; padding: 0; background: transparent !important; text-align: justify !important; }
-            .text-slate-100, .text-slate-200, .text-slate-300, .text-amber-400, .text-cyan-400, .text-emerald-400 { color: #000 !important; }
+            .text-slate-100, .text-slate-200, .text-slate-300, .text-amber-400, .text-cyan-400, .text-emerald-400 { color: #111 !important; }
         }
     </style>
 </head>
@@ -263,19 +236,19 @@
                                 </button>
                                 <button @click="printOrSavePDF()" class="text-xs text-white flex items-center space-x-1.5 bg-gradient-to-r from-amber-600 to-indigo-600 hover:from-amber-500 hover:to-indigo-500 px-4 py-2 rounded-xl font-medium transition shadow-md">
                                     <i data-lucide="printer" class="w-3.5 h-3.5"></i>
-                                    <span>Print / Save PDF</span>
+                                    <span>Print / Save PDF (Justified Booklet)</span>
                                 </button>
                             </div>
                         </div>
                     </div>
 
                     <!-- Printable Container wrapper styled exactly like Xylem booklet with Justified text -->
-                    <div id="printableArea" class="print-paper-sheet">
+                    <div id="printableArea" class="print-paper-sheet bg-[#fdfbf7] text-[#111111] p-6 sm:p-10 rounded-2xl border border-slate-800 shadow-xl font-serif space-y-6 text-justify">
                         
                         <!-- Print Header -->
-                        <div class="print-header-block">
-                            <h2 x-text="docTitle"></h2>
-                            <p x-text="generatedData.exam + ' • ' + generatedData.subject"></p>
+                        <div class="print-header-block text-center border-b-2 border-[#111111] pb-4 mb-6">
+                            <h2 class="text-xl font-extrabold tracking-wider uppercase text-[#111111]" x-text="docTitle"></h2>
+                            <p class="text-xs font-bold uppercase tracking-widest text-[#333333] mt-1" x-text="generatedData.exam + ' • ' + generatedData.subject"></p>
                         </div>
 
                         <!-- Dynamic Layout (Single or Double Column based on user choice) -->
@@ -297,7 +270,7 @@
 
                                 <!-- Options Grid / List -->
                                 <template x-if="generatedData.options && generatedData.options.length > 0">
-                                    <div :class="config.layout === 'double' ? 'print-options-grid-2 pt-1 text-xs text-justify' : 'print-options-grid-1 pt-1 text-xs text-justify'">
+                                    <div :class="config.layout === 'double' ? 'print-options-grid-2 grid grid-cols-2 gap-x-4 gap-y-2 pt-1 text-xs text-justify' : 'print-options-grid-1 flex flex-col gap-2 pt-1 text-xs text-justify'">
                                         <template x-for="(opt, idx) in generatedData.options">
                                             <div class="flex items-start space-x-1.5">
                                                 <span class="font-bold shrink-0" x-text="'(' + ['1', '2', '3', '4'][idx] + ')'"></span>
@@ -503,6 +476,7 @@
                     this.isGenerating = true;
                     this.generationStep = 'Consulting Gemini 3.5 Flash-Lite Engine...';
 
+                    // Updated Prompt strictly enforcing brevity and no AI monologue in the step-by-step solution
                     const systemInstruction = `Persona: Act as Rajan MV, a veteran question-setter and Chief ${this.config.subject} Content Creator for top-tier ${this.config.exam} coaching institutes.
                     Context: The target audience consists of 17-19-year-old students solving high-difficulty entrance papers.
                     Task: Generate 1 original ${this.config.exam} level question on the requested topic.
@@ -513,7 +487,7 @@
                     - Provide a step-by-step breakdown pointing out the "Exam Trap".
                     - Always keep a surprise thing or elegant shortcut in the solution.
                     - Format all mathematical variables and equations strictly in LaTeX wrapped in $...$.
-                    - VERY IMPORTANT: For the "stepByStepSolution", do NOT output your internal thinking, reasoning process, or conversational filler. Provide only the FINAL, CORRECT mathematical and logical steps briefly and concisely.
+                    - VERY IMPORTANT: For the "stepByStepSolution", do NOT output your internal thinking, reasoning process, or conversational filler (e.g. avoid phrases like "Let's break this down" or "First, we need to"). Provide only the FINAL, CORRECT mathematical and logical steps briefly and concisely.
 
                     You MUST return your response as a valid JSON object with these exact keys:
                     - "exam": string
