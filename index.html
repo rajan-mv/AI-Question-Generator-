@@ -14,6 +14,9 @@
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- NEW: html2pdf.js Library for iPad-safe PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         [x-cloak] { display: none !important; }
         .canvas-container { touch-action: none; }
@@ -22,6 +25,10 @@
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #334155; }
         
+        /* 
+         * Note: @media print is kept as a fallback, but html2pdf 
+         * will rely primarily on the screen styles to build the PDF canvas.
+         */
         @media print {
             body { background: #fdfbf7 !important; color: #111111 !important; font-family: 'Times New Roman', Times, serif !important; margin: 0 !important; padding: 0 !important; }
             header, section.w-5\/12, .no-print { display: none !important; }
@@ -234,9 +241,11 @@
                                     <i data-lucide="copy" class="w-3.5 h-3.5 text-amber-400"></i>
                                     <span>Copy Markdown</span>
                                 </button>
-                                <button @click="printOrSavePDF()" class="text-xs text-white flex items-center space-x-1.5 bg-gradient-to-r from-amber-600 to-indigo-600 hover:from-amber-500 hover:to-indigo-500 px-4 py-2 rounded-xl font-medium transition shadow-md">
-                                    <i data-lucide="printer" class="w-3.5 h-3.5"></i>
-                                    <span>Print / Save PDF (Justified Booklet)</span>
+                                
+                                <!-- NEW DOWNLOAD PDF BUTTON -->
+                                <button id="downloadPdfBtn" @click="downloadPDF()" class="text-xs text-white flex items-center space-x-1.5 bg-gradient-to-r from-amber-600 to-indigo-600 hover:from-amber-500 hover:to-indigo-500 px-4 py-2 rounded-xl font-medium transition shadow-md">
+                                    <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                                    <span>Download PDF</span>
                                 </button>
                             </div>
                         </div>
@@ -284,7 +293,8 @@
                         </div>
 
                         <!-- Professor Solution Section -->
-                        <div class="print-solution-section pt-8 border-t-2 border-dashed border-slate-300 space-y-4 mt-8 text-justify">
+                        <!-- Note: html2pdf respects 'page-break-before: always' -->
+                        <div class="print-solution-section pt-8 border-t-2 border-dashed border-slate-300 space-y-4 mt-8 text-justify" style="page-break-before: always;">
                             <div class="flex items-center justify-between flex-wrap gap-2 border-b border-slate-300 pb-2">
                                 <h4 class="text-xs font-bold uppercase tracking-widest text-[#111]">Verified Answer Key & Detailed Solution</h4>
                                 <span class="text-xs font-mono font-bold bg-slate-200 px-3 py-1 rounded math-content" x-html="'Correct Answer: ' + renderFormattedMath(generatedData.correctAnswer)"></span>
@@ -462,6 +472,45 @@
                     return processed;
                 },
 
+                // NEW: Client-side PDF Generation Function bypassing iPad Safari bugs
+                async downloadPDF() {
+                    if (typeof html2pdf === 'undefined') {
+                        alert('PDF engine is still loading. Please try again in a few seconds.');
+                        return;
+                    }
+
+                    const btn = document.getElementById('downloadPdfBtn');
+                    const originalBtnContent = btn.innerHTML;
+                    
+                    // Show loading state
+                    btn.innerHTML = '<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i><span>Generating PDF...</span>';
+                    lucide.createIcons();
+
+                    const element = document.getElementById('printableArea');
+                    
+                    // html2pdf configuration
+                    const opt = {
+                        margin:       [15, 15, 15, 15], // 15mm margins on all sides
+                        filename:     (this.docTitle || 'Question_King') + '.pdf',
+                        image:        { type: 'jpeg', quality: 0.98 },
+                        html2canvas:  { scale: 2, useCORS: true, letterRendering: true }, // scale: 2 ensures high resolution text
+                        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    };
+
+                    try {
+                        // Generate and download
+                        await html2pdf().set(opt).from(element).save();
+                    } catch (err) {
+                        console.error("PDF Generation failed:", err);
+                        alert("There was an error generating the PDF. Please try again.");
+                    } finally {
+                        // Restore button
+                        btn.innerHTML = originalBtnContent;
+                        lucide.createIcons();
+                    }
+                },
+
+                // Fallback to standard print if user still wants it
                 printOrSavePDF() {
                     document.title = this.docTitle || 'Question_King_Assessment';
                     window.print();
@@ -476,7 +525,6 @@
                     this.isGenerating = true;
                     this.generationStep = 'Consulting Gemini 3.5 Flash-Lite Engine...';
 
-                    // Updated Prompt strictly enforcing brevity and no AI monologue in the step-by-step solution
                     const systemInstruction = `Persona: Act as Rajan MV, a veteran question-setter and Chief ${this.config.subject} Content Creator for top-tier ${this.config.exam} coaching institutes.
                     Context: The target audience consists of 17-19-year-old students solving high-difficulty entrance papers.
                     Task: Generate 1 original ${this.config.exam} level question on the requested topic.
